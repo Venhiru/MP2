@@ -6,16 +6,19 @@ from pyglet.window import key
 from pathlib import Path
 
 
-bgm = pyglet.media.load('Music.mp3')
-hitsound = pyglet.media.load('hitsound.wav', streaming=False)
-failsound = pyglet.media.load('failsound.mp3', streaming=False)
-goodsound = pyglet.media.load('goodsound.wav', streaming=False)
+bgm = pyglet.media.load('sounds/Music.mp3')
+hitsound = pyglet.media.load('sounds/hitsound.wav', streaming=False)
+failsound = pyglet.media.load('sounds/failsound.mp3', streaming=False)
+goodsound = pyglet.media.load('sounds/goodsound.wav', streaming=False)
 image = []
 for x in range(0,6):
-	image.append(pyglet.image.load(str(x) + 'lives.png'))
+	image.append(str(x) + 'lives.png')
 
-window = pyglet.window.Window(1280, 720, caption = "Oppa Hangaman Style", resizable=False)
+window = pyglet.window.Window(1280, 720, caption = "Oppa Hangman Style", resizable=False)
 window.set_location(130, 50)
+
+
+
 def preload():
 	x = random.randint(0,4)
 	file_name, items = engine.pick_category(x)
@@ -46,33 +49,53 @@ def reload():
 	scores = pyglet.text.Label(str(score), font_size = 20, x=270, y=600, anchor_x='center', anchor_y='center')
 	#buhay = pyglet.text.Label(str(lives), font_size = 30, x=1100, y=600, anchor_x='center', anchor_y='center')
 	messages = pyglet.text.Label(message, font_size = 30, x=1280//2, y=180, anchor_x='center', anchor_y='center')
-	hanged_man = pyglet.sprite.Sprite(image[lives])
+	hanged_man.update()
 	hanged_man.position = (425, 325)
 	category.color = (100, 200, 200, 255)
 	scores.color = (123, 209, 120, 55)
+
+class Image(pyglet.sprite.Sprite):
+	global lives
+	def __init__(self):
+		self.imahe = pyglet.image.load(image[lives])
+		super(Image, self).__init__(self.imahe)
+		self.position = (425, 325)
+	def update(self):
+		self.imahe = pyglet.image.load(image[lives])
+		super(Image, self).__init__(self.imahe)
 
 title = pyglet.text.Label('Titulo ay Di Pa Alam', font_size=60, x = window.width/2, y= window.height*3/4 - 50 , anchor_x = 'center',anchor_y ='center')
 title.bold =True
 title.italic = True
 title.color = (100,234,189,200)
 
+
 intro = pyglet.text.Label('Press mo yung "space" para magstart', font_size=30, x = window.width/2, y= window.height/2-100, anchor_x = 'center',anchor_y ='center')
 intro.color = (220, 100, 150, 255)
+intro.font_name = 'Arial'
+
 
 scoring = pyglet.text.Label('', font_size = 30, x=140, y=600, anchor_x='center', anchor_y='center')
 
-#printbuhay = pyglet.text.Label('Lives left: ', font_size = 30, x=950, y=600, anchor_x='center', anchor_y='center')
 
 ending_perfect = pyglet.text.Label('Noice Wan! Nadali mo!',font_size = 40, x=1280//2, y=720//2, anchor_x='center', anchor_y='center')
+
+
 ending_notperf = pyglet.text.Label('Wala na, pinish na :(',font_size = 50, x=1280//2, y=300, anchor_x='center', anchor_y='center')
 ending_notperf.color = (105,105,205,205)
+
+
 try_again = pyglet.text.Label('press mo "r" kung uulit ka',font_size = 50, x=1280//2, y=220, anchor_x='center', anchor_y='center')
+
+
 
 file_name,items,lives,score = preload()
 current_word,blanks,guesses = loaditem()
 
+
 message = ''
 blnk = ' '.join(blanks)
+
 
 show_score = pyglet.text.Label('Your Score: {}'.format(score),font_size = 20, x=1280//2, y=720//2 - 60, anchor_x='center', anchor_y='center')
 
@@ -88,13 +111,11 @@ scores.color = (123, 209, 120, 55)
 
 messages = pyglet.text.Label(message, font_size = 30, x=1280//2, y=180, anchor_x='center', anchor_y='center')
 
-hanged_man = pyglet.sprite.Sprite(image[lives])
-hanged_man.position = (425, 325)
-
 game = False
 check = False
 retry = False
 
+hanged_man = Image()
 
 @window.event
 def on_draw():
@@ -126,7 +147,7 @@ def on_draw():
 @window.event
 def on_key_press(symbol, modifiers):
 	global game,check,current_word, blanks, guesses, items, score, lives,message, blnk
-	global blankses, scores, messages, buhay,retry, hanged_man
+	global blankses, scores, messages, buhay,retry, hanged_man, index
 	hitsound.play()
 	print('key ' + str(symbol) + " was pressed (" + str(chr(symbol)) + ')')
 	if retry:
@@ -155,7 +176,7 @@ def on_key_press(symbol, modifiers):
 			lives -= 1
 			buhay = pyglet.text.Label(str(lives), font_size = 30, x=1100, y=600, anchor_x='center', anchor_y='center')
 			messages = pyglet.text.Label(message, font_size = 30, x=1280//2, y=180, anchor_x='center', anchor_y='center')
-			hanged_man = pyglet.sprite.Sprite(image[lives])
+			hanged_man.update()
 			hanged_man.position = (425, 325)
 			if lives == 0:
 				game = False
